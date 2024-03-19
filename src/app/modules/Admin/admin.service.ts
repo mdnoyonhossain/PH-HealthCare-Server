@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Admin, Prisma } from "@prisma/client";
 import { adminSearchAbleFields } from "./admin.constant";
 import { paginationHalper } from "../../../helpars/paginationHelpar";
 import prisma from "../../../shared/prisma";
@@ -43,9 +43,44 @@ const getAllFromDB = async (params: any, options: any) => {
             createdAt: 'desc'
         }
     });
+
+    const total = await prisma.admin.count({
+        where: whereCondions
+    });
+
+    return {
+        meta: {
+            page,
+            limit,
+            total
+        },
+        data: result
+    }
+}
+
+const getByIdFromDB = async (id: string) => {
+    const result = await prisma.admin.findUnique({
+        where: {
+            id
+        }
+    });
+    
+    return result;
+}
+
+const updateIntoDB = async (id: string, data: Partial<Admin>) => {
+    const result = await prisma.admin.update({
+        where: {
+            id
+        },
+        data
+    });
+
     return result;
 }
 
 export const AdminService = {
-    getAllFromDB
+    getAllFromDB,
+    getByIdFromDB,
+    updateIntoDB
 }
