@@ -1,15 +1,18 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { AdminService } from "./admin.service";
 import pick from "../../../shared/pick";
 import { adminFilterableFields } from "./admin.constant";
+import sendResponse from "../../../shared/sendResponse";
+import httpStatus from "http-status";
 
-const getAllFromDB = async (req: Request, res: Response) => {
+const getAllFromDB = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const filters = pick(req.query, adminFilterableFields);
         const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
         const result = await AdminService.getAllFromDB(filters, options);
 
-        res.status(200).json({
+        sendResponse(res, {
+            statusCode: httpStatus.OK,
             success: true,
             message: "Admin Data Retrived!",
             meta: result.meta,
@@ -17,93 +20,77 @@ const getAllFromDB = async (req: Request, res: Response) => {
         });
     }
     catch (err: any) {
-        res.status(500).json({
-            success: false,
-            message: err.name || "Something went wrong!",
-            error: err
-        })
+        next(err);
     }
 }
 
-const getByIdFromDB = async (req: Request, res: Response) => {
+const getByIdFromDB = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params;
         const result = await AdminService.getByIdFromDB(id);
 
-        res.status(200).json({
+        sendResponse(res, {
+            statusCode: httpStatus.OK,
             success: true,
             message: "Admin Data Retrived by Id!",
             data: result
         });
     }
     catch (err: any) {
-        res.status(500).json({
-            success: false,
-            message: err.name || "Something went wrong!",
-            error: err
-        })
+        next(err);
     }
 }
 
-const updateIntoDB = async (req: Request, res: Response) => {
+const updateIntoDB = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params;
         const adminData = req.body;
         console.log(req.body);
         const result = await AdminService.updateIntoDB(id, adminData);
 
-        res.status(200).json({
+        sendResponse(res, {
+            statusCode: httpStatus.OK,
             success: true,
             message: 'Admin Updated Successfully!',
             data: result
-        })
+        });
     }
     catch (err: any) {
-        res.status(500).json({
-            success: false,
-            message: err.name || "Something went wrong!",
-            error: err
-        })
+        next(err);
     }
 }
 
-const deleteFromDB = async (req: Request, res: Response) => {
+const deleteFromDB = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params;
         const result = await AdminService.deleteFromDB(id);
 
-        res.status(200).json({
+        sendResponse(res, {
+            statusCode: httpStatus.OK,
             success: true,
             message: 'Admin Deleted Successfully!',
             data: result
-        })
+        });
     }
     catch (err: any) {
-        res.status(500).json({
-            success: false,
-            message: err.name || "Something went wrong!",
-            error: err
-        })
+        next(err);
     }
 }
 
-const softDeleteFromDB = async (req: Request, res: Response) => {
+const softDeleteFromDB = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params;
         const result = await AdminService.softDeleteFromDB(id);
 
-        res.status(200).json({
+        sendResponse(res, {
+            statusCode: httpStatus.OK,
             success: true,
             message: 'Admin Deleted Successfully!',
             data: result
-        })
+        });
     }
     catch (err: any) {
-        res.status(500).json({
-            success: false,
-            message: err.name || "Something went wrong!",
-            error: err
-        })
+        next(err);
     }
 }
 
