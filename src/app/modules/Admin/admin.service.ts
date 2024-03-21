@@ -2,8 +2,11 @@ import { Admin, Prisma, UserStatus } from "@prisma/client";
 import { adminSearchAbleFields } from "./admin.constant";
 import { paginationHalper } from "../../../helpars/paginationHelpar";
 import prisma from "../../../shared/prisma";
+import { TAdminFilterRequest } from "./admin.interface";
+import { TPaginationOptions } from "../../interfaces.ts/pagination";
 
-const getAllFromDB = async (params: any, options: any) => {
+const getAllFromDB = async (params: TAdminFilterRequest, options: TPaginationOptions) => {
+    console.log({ params, options });
     const { searchTerm, ...filterData } = params;
     const { limit, page, skip, sortBy, sortOrder } = paginationHalper.calculatePagination(options);
     const andCondions: Prisma.AdminWhereInput[] = [];
@@ -25,7 +28,7 @@ const getAllFromDB = async (params: any, options: any) => {
         andCondions.push({
             AND: Object.keys(filterData).map(key => ({
                 [key]: {
-                    equals: filterData[key]
+                    equals: (filterData as any)[key]
                 }
             }))
         })
