@@ -6,7 +6,7 @@ import ApiError from "../errors/ApiError";
 import httpStatus from "http-status";
 
 const auth = (...roles: string[]) => {
-    return async (req: Request, res: Response, next: NextFunction) => {
+    return async (req: Request & { user?: any }, res: Response, next: NextFunction) => {
         try {
             const token = req.headers.authorization;
 
@@ -15,6 +15,8 @@ const auth = (...roles: string[]) => {
             }
 
             const verifiedUser = jwtHelpers.verifyToken(token, config.jwt.access_token_secret as Secret);
+
+            req.user = verifiedUser;
 
             if (roles.length && !roles.includes(verifiedUser.role)) {
                 throw new ApiError(httpStatus.FORBIDDEN, "Forbidden!");

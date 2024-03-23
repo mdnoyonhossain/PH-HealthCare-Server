@@ -4,6 +4,7 @@ import { adminValidationSchemas } from './admin.validations';
 import validateRequest from '../../middlewares/validateRequest';
 import auth from '../../middlewares/auth';
 import { UserRole } from '@prisma/client';
+import { AuthController } from '../Auth/auth.controller';
 
 const router = express.Router();
 
