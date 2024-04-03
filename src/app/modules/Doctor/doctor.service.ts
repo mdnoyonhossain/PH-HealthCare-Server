@@ -23,12 +23,11 @@ const getAllFromDB = async (filters: TDoctorFilterRequest, options: TPaginationO
     };
 
     // doctor > doctorSpecialties > specialties -> title
-
     if (specialties && specialties.length > 0) {
         andConditions.push({
             doctorSpecialties: {
                 some: {
-                    specialties: {
+                    specialities: {
                         title: {
                             contains: specialties,
                             mode: 'insensitive'
@@ -36,8 +35,8 @@ const getAllFromDB = async (filters: TDoctorFilterRequest, options: TPaginationO
                     }
                 }
             }
-        })
-    };
+        });
+    }
 
 
     if (Object.keys(filterData).length > 0) {
@@ -67,7 +66,7 @@ const getAllFromDB = async (filters: TDoctorFilterRequest, options: TPaginationO
         include: {
             doctorSpecialties: {
                 include: {
-                    specialties: true
+                    specialities: true
                 }
             }
         },
@@ -96,7 +95,7 @@ const getByIdFromDB = async (id: string): Promise<Doctor | null> => {
         include: {
             doctorSpecialties: {
                 include: {
-                    specialties: true
+                    specialities: true
                 }
             }
         }
@@ -123,26 +122,24 @@ const updateIntoDB = async (id: string, payload: TDoctorUpdate) => {
         });
 
         if (specialties && specialties.length > 0) {
-            // delete specialties
+            // Delete Specialties
             const deleteSpecialtiesIds = specialties.filter(specialty => specialty.isDeleted);
-            //console.log(deleteSpecialtiesIds)
             for (const specialty of deleteSpecialtiesIds) {
                 await transactionClient.doctorSpecialties.deleteMany({
                     where: {
                         doctorId: doctorInfo.id,
-                        specialtiesId: specialty.specialtiesId
+                        specialitiesId: specialty.specialtiesId
                     }
                 });
             }
 
-            // create specialties
+            // Create Specialties
             const createSpecialtiesIds = specialties.filter(specialty => !specialty.isDeleted);
-            console.log(createSpecialtiesIds)
             for (const specialty of createSpecialtiesIds) {
                 await transactionClient.doctorSpecialties.create({
                     data: {
                         doctorId: doctorInfo.id,
-                        specialtiesId: specialty.specialtiesId
+                        specialitiesId: specialty.specialtiesId
                     }
                 });
             }
@@ -156,7 +153,7 @@ const updateIntoDB = async (id: string, payload: TDoctorUpdate) => {
         include: {
             doctorSpecialties: {
                 include: {
-                    specialties: true
+                    specialities: true
                 }
             }
         }
