@@ -133,10 +133,7 @@ const deleteFromDB = async (user: TAuthUser, scheduleId: string) => {
     return result;
 }
 
-const getAllFromDB = async (
-    filters: TDoctorScheduleFilterRequest,
-    options: TPaginationOptions,
-) => {
+const getAllFromDB = async (filters: TDoctorScheduleFilterRequest, options: TPaginationOptions) => {
     const { limit, page, skip } = paginationHalper.calculatePagination(options);
     const { searchTerm, ...filterData } = filters;
     const andConditions = [];
