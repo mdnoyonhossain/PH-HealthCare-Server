@@ -44,12 +44,11 @@ const getAllFromDB = async (filters: TPatientFilterRequest, options: TPagination
         where: whereConditions,
         skip,
         take: limit,
-        orderBy:
-            options.sortBy && options.sortOrder
-                ? { [options.sortBy]: options.sortOrder }
-                : {
-                    createdAt: 'desc',
-                },
+        orderBy: options.sortBy && options.sortOrder ?
+            { [options.sortBy]: options.sortOrder } :
+            {
+                createdAt: 'desc',
+            },
         include: {
             medicalReport: true,
             patientHealthData: true,
