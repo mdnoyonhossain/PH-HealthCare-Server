@@ -6,6 +6,11 @@ import { TPaginationOptions } from "../../interfaces.ts/pagination";
 import { paginationHalper } from "../../../helpars/paginationHelpar";
 import { TAuthUser } from "../../interfaces.ts/common";
 
+const convertDateTime = async (date: Date) => {
+    const offset = date.getTimezoneOffset() * 60000;
+    return new Date(date.getTime() + offset);
+}
+
 const insertIntoDB = async (payload: TSchedule): Promise<Schedule[]> => {
     const { startDate, endDate, startTime, endTime } = payload;
 
@@ -37,9 +42,17 @@ const insertIntoDB = async (payload: TSchedule): Promise<Schedule[]> => {
         );
 
         while (startDateTime < endDateTime) {
+            // const scheduleData = {
+            //     startDateTime: startDateTime,
+            //     endDateTime: addMinutes(startDateTime, interverlTime)
+            // }
+
+            const s = await convertDateTime(startDateTime);
+            const e = await convertDateTime(addMinutes(startDateTime, interverlTime));
+
             const scheduleData = {
-                startDateTime: startDateTime,
-                endDateTime: addMinutes(startDateTime, interverlTime)
+                startDateTime: s,
+                endDateTime: e
             }
 
             const existingSchedule = await prisma.schedule.findFirst({
@@ -156,6 +169,7 @@ const getByIdFromDB = async (id: string): Promise<Schedule | null> => {
         }
     });
 
+    // console.log(result?.startDateTime.getHours() + ":" + result?.startDateTime.getMinutes());
     return result;
 };
 
