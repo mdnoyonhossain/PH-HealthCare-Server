@@ -1,10 +1,9 @@
-import express from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import { AdminController } from './admin.controller';
-import { adminValidationSchemas } from './admin.validations';
 import validateRequest from '../../middlewares/validateRequest';
+import { adminValidationSchemas } from './admin.validations';
 import auth from '../../middlewares/auth';
 import { UserRole } from '@prisma/client';
-import { AuthController } from '../Auth/auth.controller';
 
 const router = express.Router();
 

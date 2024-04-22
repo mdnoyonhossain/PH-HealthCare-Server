@@ -1,21 +1,22 @@
-import { Server } from "http";
-import app from "./app";
-import config from "./config";
+import { Server } from 'http';
+import app from './app'
+import config from './config';
+
+
 
 async function main() {
     const server: Server = app.listen(config.port, () => {
-        console.log(`PH Health Care Server is Running on port: ${config.port}`);
+        console.log("Sever is running on port ", config.port);
     });
 
     const exitHandler = () => {
         if (server) {
             server.close(() => {
-                console.info("Server Closed!");
-            });
+                console.info("Server closed!")
+            })
         }
         process.exit(1);
-    }
-
+    };
     process.on('uncaughtException', (error) => {
         console.log(error);
         exitHandler();
@@ -24,7 +25,7 @@ async function main() {
     process.on('unhandledRejection', (error) => {
         console.log(error);
         exitHandler();
-    });
-}
+    })
+};
 
 main();

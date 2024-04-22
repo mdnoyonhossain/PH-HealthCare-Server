@@ -1,41 +1,41 @@
-import multer from "multer";
-import path from "path";
+import multer from "multer"
+import path from "path"
+import fs from 'fs'
 import { v2 as cloudinary } from 'cloudinary';
-import fs from 'fs';
-import { TCloudinaryResponse, TFile } from "../app/interfaces.ts/file";
-import config from "../config";
+import { ICloudinaryResponse, IFile } from "../app/interfaces/file";
+
 
 cloudinary.config({
-    cloud_name: config.cloudinary.cloud_name,
-    api_key: config.cloudinary.api_key,
-    api_secret: config.cloudinary.api_secret
+    cloud_name: 'dbgrq28js',
+    api_key: '173484379744282',
+    api_secret: 'eHKsVTxIOLl5oaO_BHxBQWAK3GA'
 });
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, path.join(process.cwd(), 'uploads'));
+        cb(null, path.join(process.cwd(), 'uploads'))
     },
     filename: function (req, file, cb) {
         cb(null, file.originalname)
     }
-});
+})
 
-const upload = multer({ storage: storage });
+const upload = multer({ storage: storage })
 
-const uploadToCloudinary = async (file: TFile): Promise<TCloudinaryResponse> => {
+const uploadToCloudinary = async (file: IFile): Promise<ICloudinaryResponse | undefined> => {
     return new Promise((resolve, reject) => {
         cloudinary.uploader.upload(file.path,
-            (error: Error, result: TCloudinaryResponse) => {
-                fs.unlinkSync(file.path);
+            (error: Error, result: ICloudinaryResponse) => {
+                fs.unlinkSync(file.path)
                 if (error) {
-                    reject(error);
+                    reject(error)
                 }
                 else {
-                    resolve(result);
+                    resolve(result)
                 }
-            });
-    });
-}
+            })
+    })
+};
 
 export const fileUploader = {
     upload,

@@ -2,16 +2,16 @@ import axios from "axios";
 import config from "../../../config";
 import ApiError from "../../errors/ApiError";
 import httpStatus from "http-status";
-import { TPaymentData } from "./ssl.interface";
+import { IPaymentData } from "./ssl.interface";
 
-const initPayment = async (paymentData: TPaymentData) => {
+const initPayment = async (paymentData: IPaymentData) => {
     try {
         const data = {
             store_id: config.ssl.storeId,
             store_passwd: config.ssl.storePass,
             total_amount: paymentData.amount,
             currency: 'BDT',
-            tran_id: paymentData.transactionId,
+            tran_id: paymentData.transactionId, // use unique tran_id for each api call
             success_url: config.ssl.successUrl,
             fail_url: config.ssl.failUrl,
             cancel_url: config.ssl.cancelUrl,
@@ -37,7 +37,7 @@ const initPayment = async (paymentData: TPaymentData) => {
             ship_state: 'N/A',
             ship_postcode: 1000,
             ship_country: 'N/A',
-        }
+        };
 
         const response = await axios({
             method: 'post',
@@ -49,9 +49,10 @@ const initPayment = async (paymentData: TPaymentData) => {
         return response.data;
     }
     catch (err) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Payment error occured!');
+        throw new ApiError(httpStatus.BAD_REQUEST, "Payment erro occured!")
     }
-}
+};
+
 
 const validatePayment = async (payload: any) => {
     try {
@@ -63,9 +64,10 @@ const validatePayment = async (payload: any) => {
         return response.data;
     }
     catch (err) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Payment validation failed!');
+        throw new ApiError(httpStatus.BAD_REQUEST, "Payment validation failed!")
     }
 }
+
 
 export const SSLService = {
     initPayment,

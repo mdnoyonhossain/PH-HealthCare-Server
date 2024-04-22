@@ -1,4 +1,4 @@
-export type TDoctorFilterRequest = {
+export type IDoctorFilterRequest = {
     searchTerm?: string | undefined;
     email?: string | undefined;
     contactNo?: string | undefined;
@@ -6,7 +6,7 @@ export type TDoctorFilterRequest = {
     specialties?: string | undefined;
 };
 
-export type TDoctorUpdate = {
+export type IDoctorUpdate = {
     name: string;
     profilePhoto: string;
     contactNumber: string;
@@ -18,10 +18,10 @@ export type TDoctorUpdate = {
     qualification: string;
     currentWorkingPlace: string;
     designation: string;
-    specialties: TSpecialties[];
+    specialties: ISpecialties[];
 };
 
-export type TSpecialties = {
+export type ISpecialties = {
     specialtiesId: string;
     isDeleted?: null;
 };

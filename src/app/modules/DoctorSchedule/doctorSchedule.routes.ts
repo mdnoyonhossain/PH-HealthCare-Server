@@ -7,6 +7,11 @@ import { DoctorScheduleValidation } from './doctorSchedule.validation';
 
 const router = express.Router();
 
+/**
+ * API ENDPOINT: /doctor-schedule/
+ * 
+ * Get all doctor schedule with filtering
+ */
 router.get(
     '/',
     auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT),
@@ -17,7 +22,7 @@ router.get(
     '/my-schedule',
     auth(UserRole.DOCTOR),
     DoctorScheduleController.getMySchedule
-);
+)
 
 router.post(
     '/',
@@ -31,5 +36,6 @@ router.delete(
     auth(UserRole.DOCTOR),
     DoctorScheduleController.deleteFromDB
 );
+
 
 export const DoctorScheduleRoutes = router;

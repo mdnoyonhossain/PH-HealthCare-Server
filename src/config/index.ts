@@ -6,10 +6,9 @@ dotenv.config({ path: path.join(process.cwd(), '.env') });
 export default {
     env: process.env.NODE_ENV,
     port: process.env.PORT,
-    salt_round: process.env.SALT_ROUND,
     jwt: {
-        access_token_secret: process.env.ACCESS_TOKEN_SECRET,
-        access_token_expires_in: process.env.ACCESS_TOKEN_EXPIRES_IN,
+        jwt_secret: process.env.JWT_SECRET,
+        expires_in: process.env.EXPIRES_IN,
         refresh_token_secret: process.env.REFRESH_TOKEN_SECRET,
         refresh_token_expires_in: process.env.REFRESH_TOKEN_EXPIRES_IN,
         reset_pass_secret: process.env.RESET_PASS_TOKEN,
@@ -20,11 +19,6 @@ export default {
         email: process.env.EMAIL,
         app_pass: process.env.APP_PASS
     },
-    cloudinary: {
-        cloud_name: process.env.CLOUD_NAME,
-        api_key: process.env.API_KEY,
-        api_secret: process.env.API_SECRET,
-    },
     ssl: {
         storeId: process.env.STORE_ID,
         storePass: process.env.STORE_PASS,
@@ -32,6 +26,6 @@ export default {
         cancelUrl: process.env.CANCEL_URL,
         failUrl: process.env.FAIL_URL,
         sslPaymentApi: process.env.SSL_PAYMENT_API,
-        sslValidationApi: process.env.SSL_VALIDATIOIN_API,
+        sslValidationApi: process.env.SSL_VALIDATIOIN_API
     }
 }

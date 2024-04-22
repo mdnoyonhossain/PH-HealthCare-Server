@@ -5,28 +5,29 @@ import { Secret } from "jsonwebtoken";
 import ApiError from "../errors/ApiError";
 import httpStatus from "http-status";
 
+
 const auth = (...roles: string[]) => {
     return async (req: Request & { user?: any }, res: Response, next: NextFunction) => {
         try {
-            const token = req.headers.authorization;
+            const token = req.headers.authorization
 
             if (!token) {
-                throw new ApiError(httpStatus.UNAUTHORIZED, 'You are not authorized!');
+                throw new ApiError(httpStatus.UNAUTHORIZED, "You are not authorized!")
             }
 
-            const verifiedUser = jwtHelpers.verifyToken(token, config.jwt.access_token_secret as Secret);
+            const verifiedUser = jwtHelpers.verifyToken(token, config.jwt.jwt_secret as Secret)
 
             req.user = verifiedUser;
 
             if (roles.length && !roles.includes(verifiedUser.role)) {
-                throw new ApiError(httpStatus.FORBIDDEN, "Forbidden!");
+                throw new ApiError(httpStatus.FORBIDDEN, "Forbidden!")
             }
-            next();
+            next()
         }
         catch (err) {
-            next(err);
+            next(err)
         }
     }
-}
+};
 
 export default auth;

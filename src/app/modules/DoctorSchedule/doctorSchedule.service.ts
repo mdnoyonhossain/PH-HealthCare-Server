@@ -1,13 +1,15 @@
 import { Prisma } from "@prisma/client";
-import { paginationHalper } from "../../../helpars/paginationHelpar";
-import prisma from "../../../shared/prisma"
-import { TAuthUser } from "../../interfaces.ts/common";
-import { TPaginationOptions } from "../../interfaces.ts/pagination";
+import { paginationHelper } from "../../../helpars/paginationHelper";
+import prisma from "../../../shared/prisma";
+import { IAuthUser } from "../../interfaces/common";
+import { IPaginationOptions } from "../../interfaces/pagination";
 import ApiError from "../../errors/ApiError";
 import httpStatus from "http-status";
-import { TDoctorScheduleFilterRequest } from "./doctorSchedule.interface";
+import { IDoctorScheduleFilterRequest } from "./doctorSchedule.interface";
 
-const insertIntoDB = async (user: any, payload: { scheduleIds: string[] }) => {
+const insertIntoDB = async (user: any, payload: {
+    scheduleIds: string[]
+}) => {
     const doctorData = await prisma.doctor.findUniqueOrThrow({
         where: {
             email: user.email
@@ -17,19 +19,24 @@ const insertIntoDB = async (user: any, payload: { scheduleIds: string[] }) => {
     const doctorScheduleData = payload.scheduleIds.map(scheduleId => ({
         doctorId: doctorData.id,
         scheduleId
-    }));
+    }))
 
     const result = await prisma.doctorSchedules.createMany({
         data: doctorScheduleData
     });
 
     return result;
-}
+};
 
-const getMySchedule = async (filters: any, options: TPaginationOptions, user: TAuthUser) => {
-    const { limit, page, skip } = paginationHalper.calculatePagination(options);
+
+const getMySchedule = async (
+    filters: any,
+    options: IPaginationOptions,
+    user: IAuthUser
+) => {
+    const { limit, page, skip } = paginationHelper.calculatePagination(options);
     const { startDate, endDate, ...filterData } = filters;
-    console.log(filterData);
+    //console.log(filterData)
 
     const andConditions = [];
 
@@ -51,15 +58,17 @@ const getMySchedule = async (filters: any, options: TPaginationOptions, user: TA
                     }
                 }
             ]
-        });
-    }
+        })
+    };
+
 
     if (Object.keys(filterData).length > 0) {
+
         if (typeof filterData.isBooked === 'string' && filterData.isBooked === 'true') {
-            filterData.isBooked = true;
+            filterData.isBooked = true
         }
         else if (typeof filterData.isBooked === 'string' && filterData.isBooked === 'false') {
-            filterData.isBooked = false;
+            filterData.isBooked = false
         }
 
         andConditions.push({
@@ -73,7 +82,9 @@ const getMySchedule = async (filters: any, options: TPaginationOptions, user: TA
         });
     }
 
-    const whereConditions: Prisma.DoctorSchedulesWhereInput = andConditions.length > 0 ? { AND: andConditions } : {};
+    const whereConditions: Prisma.DoctorSchedulesWhereInput =
+        andConditions.length > 0 ? { AND: andConditions } : {};
+
 
     const result = await prisma.doctorSchedules.findMany({
         where: whereConditions,
@@ -86,7 +97,6 @@ const getMySchedule = async (filters: any, options: TPaginationOptions, user: TA
 
                 }
     });
-
     const total = await prisma.doctorSchedules.count({
         where: whereConditions
     });
@@ -101,8 +111,8 @@ const getMySchedule = async (filters: any, options: TPaginationOptions, user: TA
     };
 };
 
+const deleteFromDB = async (user: IAuthUser, scheduleId: string) => {
 
-const deleteFromDB = async (user: TAuthUser, scheduleId: string) => {
     const doctorData = await prisma.doctor.findUniqueOrThrow({
         where: {
             email: user?.email
@@ -118,7 +128,7 @@ const deleteFromDB = async (user: TAuthUser, scheduleId: string) => {
     });
 
     if (isBookedSchedule) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'You can not delete the schedule because of the schedule is already booked!')
+        throw new ApiError(httpStatus.BAD_REQUEST, "You can not delete the schedule because of the schedule is already booked!")
     }
 
     const result = await prisma.doctorSchedules.delete({
@@ -128,13 +138,16 @@ const deleteFromDB = async (user: TAuthUser, scheduleId: string) => {
                 scheduleId: scheduleId
             }
         }
-    });
-
+    })
     return result;
+
 }
 
-const getAllFromDB = async (filters: TDoctorScheduleFilterRequest, options: TPaginationOptions) => {
-    const { limit, page, skip } = paginationHalper.calculatePagination(options);
+const getAllFromDB = async (
+    filters: IDoctorScheduleFilterRequest,
+    options: IPaginationOptions,
+) => {
+    const { limit, page, skip } = paginationHelper.calculatePagination(options);
     const { searchTerm, ...filterData } = filters;
     const andConditions = [];
 
@@ -192,6 +205,8 @@ const getAllFromDB = async (filters: TDoctorScheduleFilterRequest, options: TPag
         data: result,
     };
 };
+
+
 
 export const DoctorScheduleService = {
     insertIntoDB,

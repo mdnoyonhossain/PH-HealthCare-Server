@@ -1,13 +1,14 @@
-import prisma from "../../../shared/prisma";
-import { TAuthUser } from "../../interfaces.ts/common";
+import prisma from "../../../shared/prisma"
+import { IAuthUser } from "../../interfaces/common"
 import { v4 as uuidv4 } from 'uuid';
-import { TPaginationOptions } from "../../interfaces.ts/pagination";
-import { paginationHalper } from "../../../helpars/paginationHelpar";
+import { IPaginationOptions } from "../../interfaces/pagination";
+import { paginationHelper } from "../../../helpars/paginationHelper";
 import { AppointmentStatus, PaymentStatus, Prisma, UserRole } from "@prisma/client";
 import ApiError from "../../errors/ApiError";
 import httpStatus from "http-status";
 
-const createAppointment = async (user: TAuthUser, payload: any) => {
+
+const createAppointment = async (user: IAuthUser, payload: any) => {
     const patientData = await prisma.patient.findUniqueOrThrow({
         where: {
             email: user?.email
@@ -19,7 +20,6 @@ const createAppointment = async (user: TAuthUser, payload: any) => {
             id: payload.doctorId
         }
     });
-
 
     await prisma.doctorSchedules.findFirstOrThrow({
         where: {
@@ -59,8 +59,9 @@ const createAppointment = async (user: TAuthUser, payload: any) => {
             }
         });
 
-        // PH-HealthCare-datetime
+        // PH-HealthCare-datatime
         const today = new Date();
+
         const transactionId = "PH-HealthCare-" + today.getFullYear() + "-" + today.getMonth() + "-" + today.getDay() + "-" + today.getHours() + "-" + today.getMinutes();
 
         await tx.payment.create({
@@ -69,16 +70,17 @@ const createAppointment = async (user: TAuthUser, payload: any) => {
                 amount: doctorData.appointmentFee,
                 transactionId
             }
-        });
+        })
 
-        return appointmentData
-    });
+        return appointmentData;
+    })
 
     return result;
-}
+};
 
-const getMyAppointment = async (user: TAuthUser, filters: any, options: TPaginationOptions) => {
-    const { page, limit, skip } = paginationHalper.calculatePagination(options);
+const getMyAppointment = async (user: IAuthUser, filters: any, options: IPaginationOptions) => {
+
+    const { limit, page, skip } = paginationHelper.calculatePagination(options);
     const { ...filterData } = filters;
 
     const andConditions: Prisma.AppointmentWhereInput[] = [];
@@ -88,14 +90,14 @@ const getMyAppointment = async (user: TAuthUser, filters: any, options: TPaginat
             patient: {
                 email: user?.email
             }
-        });
+        })
     }
     else if (user?.role === UserRole.DOCTOR) {
         andConditions.push({
             doctor: {
                 email: user?.email
             }
-        });
+        })
     }
 
     if (Object.keys(filterData).length > 0) {
@@ -104,7 +106,6 @@ const getMyAppointment = async (user: TAuthUser, filters: any, options: TPaginat
                 equals: (filterData as any)[key],
             },
         }));
-
         andConditions.push(...filterConditions);
     }
 
@@ -119,7 +120,7 @@ const getMyAppointment = async (user: TAuthUser, filters: any, options: TPaginat
             ? { [options.sortBy]: options.sortOrder }
             : { createdAt: 'desc' },
         include: user?.role === UserRole.PATIENT
-            ? { doctor: true, schedule: true } : { patient: { include: { patientHealthData: true, medicalReport: true } }, schedule: true }
+            ? { doctor: true, schedule: true } : { patient: { include: { medicalReport: true, patientHealthData: true } }, schedule: true }
     });
 
     const total = await prisma.appointment.count({
@@ -134,12 +135,15 @@ const getMyAppointment = async (user: TAuthUser, filters: any, options: TPaginat
         },
         data: result,
     };
-}
+};
 
-const getAllFromDB = async (filters: any, options: TPaginationOptions) => {
-    const { limit, page, skip } = paginationHalper.calculatePagination(options);
+
+const getAllFromDB = async (
+    filters: any,
+    options: IPaginationOptions
+) => {
+    const { limit, page, skip } = paginationHelper.calculatePagination(options);
     const { patientEmail, doctorEmail, ...filterData } = filters;
-
     const andConditions = [];
 
     if (patientEmail) {
@@ -202,7 +206,7 @@ const getAllFromDB = async (filters: any, options: TPaginationOptions) => {
     };
 };
 
-const changeAppointmentStatus = async (appointmentId: string, status: AppointmentStatus, user: TAuthUser) => {
+const changeAppointmentStatus = async (appointmentId: string, status: AppointmentStatus, user: IAuthUser) => {
     const appointmentData = await prisma.appointment.findUniqueOrThrow({
         where: {
             id: appointmentId
@@ -214,7 +218,7 @@ const changeAppointmentStatus = async (appointmentId: string, status: Appointmen
 
     if (user?.role === UserRole.DOCTOR) {
         if (!(user.email === appointmentData.doctor.email)) {
-            throw new ApiError(httpStatus.BAD_REQUEST, 'This is not your appointment!');
+            throw new ApiError(httpStatus.BAD_REQUEST, "This is not your appointment!")
         }
     }
 
@@ -228,10 +232,11 @@ const changeAppointmentStatus = async (appointmentId: string, status: Appointmen
     });
 
     return result;
+
 }
 
 const cancelUnpaidAppointments = async () => {
-    const thirtyMinAgo = new Date(Date.now() - 30 * 60 * 1000);
+    const thirtyMinAgo = new Date(Date.now() - 30 * 60 * 1000)
 
     const unPaidAppointments = await prisma.appointment.findMany({
         where: {
@@ -239,7 +244,7 @@ const cancelUnpaidAppointments = async () => {
                 lte: thirtyMinAgo
             },
             paymentStatus: PaymentStatus.UNPAID
-        }
+        },
     });
 
     const appointmentIdsToCancel = unPaidAppointments.map(appointment => appointment.id);
@@ -261,19 +266,20 @@ const cancelUnpaidAppointments = async () => {
             }
         });
 
-        for (const unPaidAppointment of unPaidAppointments) {
+        for (const upPaidAppointment of unPaidAppointments) {
             await tx.doctorSchedules.updateMany({
                 where: {
-                    doctorId: unPaidAppointment.doctorId,
-                    scheduleId: unPaidAppointment.scheduleId
+                    doctorId: upPaidAppointment.doctorId,
+                    scheduleId: upPaidAppointment.scheduleId
                 },
                 data: {
                     isBooked: false
                 }
-            });
+            })
         }
+    })
 
-    });
+    //console.log("updated")
 }
 
 export const AppointmentService = {

@@ -1,4 +1,4 @@
-const pick = <T extends Record<string, unknown>, K extends keyof T>(obj: T, keys: K[]): Partial<T> => {
+const pick = <T extends Record<string, unknown>, k extends keyof T>(obj: T, keys: k[]): Partial<T> => {
     const finalObj: Partial<T> = {};
 
     for (const key of keys) {
@@ -7,6 +7,7 @@ const pick = <T extends Record<string, unknown>, K extends keyof T>(obj: T, keys
         }
     }
 
+    console.log(finalObj)
     return finalObj;
 }
 

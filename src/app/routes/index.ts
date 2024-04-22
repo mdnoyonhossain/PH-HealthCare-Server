@@ -1,10 +1,10 @@
 import express from 'express';
-import { UserRoutes } from '../modules/User/user.routes';
+import { userRoutes } from '../modules/User/user.routes';
 import { AdminRoutes } from '../modules/Admin/admin.routes';
-import { AuthRouter } from '../modules/Auth/auth.routes';
+import { AuthRoutes } from '../modules/Auth/auth.routes';
 import { SpecialtiesRoutes } from '../modules/Specialties/specialties.routes';
 import { DoctorRoutes } from '../modules/Doctor/doctor.routes';
-import { PatientRoutes } from '../modules/Patient/patient.routes';
+import { PatientRoutes } from '../modules/Patient/patient.route';
 import { ScheduleRoutes } from '../modules/Schedule/schedule.routes';
 import { DoctorScheduleRoutes } from '../modules/DoctorSchedule/doctorSchedule.routes';
 import { AppointmentRoutes } from '../modules/Appointment/appointment.routes';
@@ -18,7 +18,7 @@ const router = express.Router();
 const moduleRoutes = [
     {
         path: '/user',
-        route: UserRoutes
+        route: userRoutes
     },
     {
         path: '/admin',
@@ -26,7 +26,7 @@ const moduleRoutes = [
     },
     {
         path: '/auth',
-        route: AuthRouter
+        route: AuthRoutes
     },
     {
         path: '/specialties',
@@ -70,6 +70,6 @@ const moduleRoutes = [
     }
 ];
 
-moduleRoutes.forEach(route => router.use(route.path, route.route));
+moduleRoutes.forEach(route => router.use(route.path, route.route))
 
 export default router;

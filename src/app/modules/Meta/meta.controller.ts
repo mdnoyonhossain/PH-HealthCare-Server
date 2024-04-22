@@ -1,18 +1,19 @@
-import httpStatus from "http-status";
-import catchAsync from "../../../shared/catchAsync";
-import sendResponse from "../../../shared/sendResponse";
-import { MetaService } from "./meta.service";
 import { Request, Response } from "express";
-import { TAuthUser } from "../../interfaces.ts/common";
+import catchAsync from "../../../shared/catchAsync";
+import { MetaService } from "./meta.service";
+import sendResponse from "../../../shared/sendResponse";
+import httpStatus from "http-status";
+import { IAuthUser } from "../../interfaces/common";
 
-const fetchDashboardMetaData = catchAsync(async (req: Request & { user?: TAuthUser }, res: Response) => {
+const fetchDashboardMetaData = catchAsync(async (req: Request & { user?: IAuthUser }, res: Response) => {
+
     const user = req.user;
-    const result = await MetaService.fetchDashboardMetaData(user as TAuthUser);
+    const result = await MetaService.fetchDashboardMetaData(user as IAuthUser);
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
-        message: "Meta Data Retrival Successfully!",
+        message: "Meta data retrival successfully!",
         data: result
     })
 });

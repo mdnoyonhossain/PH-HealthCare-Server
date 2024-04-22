@@ -1,4 +1,4 @@
-export type TPaymentData = {
+export type IPaymentData = {
     amount: number;
     transactionId: string;
     name: string;

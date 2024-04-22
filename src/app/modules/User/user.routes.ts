@@ -18,24 +18,24 @@ router.get(
     '/me',
     auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT),
     userController.getMyProfile
-);
+)
 
 router.post(
-    '/create-admin',
+    "/create-admin",
     auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
     fileUploader.upload.single('file'),
     (req: Request, res: Response, next: NextFunction) => {
-        req.body = userValidation.createAdmin.parse(JSON.parse(req.body.data));
+        req.body = userValidation.createAdmin.parse(JSON.parse(req.body.data))
         return userController.createAdmin(req, res, next)
     }
 );
 
 router.post(
-    '/create-doctor',
+    "/create-doctor",
     auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
     fileUploader.upload.single('file'),
     (req: Request, res: Response, next: NextFunction) => {
-        req.body = userValidation.createDoctor.parse(JSON.parse(req.body.data));
+        req.body = userValidation.createDoctor.parse(JSON.parse(req.body.data))
         return userController.createDoctor(req, res, next)
     }
 );
@@ -57,13 +57,14 @@ router.patch(
 );
 
 router.patch(
-    '/update-my-profile',
+    "/update-my-profile",
     auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT),
     fileUploader.upload.single('file'),
     (req: Request, res: Response, next: NextFunction) => {
         req.body = JSON.parse(req.body.data)
-        return userController.updateMyProfile(req, res, next)
+        return userController.updateMyProfie(req, res, next)
     }
 );
 
-export const UserRoutes = router;
+
+export const userRoutes = router;

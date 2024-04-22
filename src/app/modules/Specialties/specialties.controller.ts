@@ -1,22 +1,23 @@
-import httpStatus from "http-status";
+import { Request, Response } from "express";
 import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
+import httpStatus from "http-status";
 import { SpecialtiesService } from "./specialties.service";
 
-const insertIntoDB = catchAsync(async (req, res) => {
-    const result = await SpecialtiesService.insertIntoDB(req);
+const inserIntoDB = catchAsync(async (req: Request, res: Response) => {
+    console.log(req.body)
+    const result = await SpecialtiesService.inserIntoDB(req);
 
     sendResponse(res, {
-        statusCode: httpStatus.CREATED,
+        statusCode: httpStatus.OK,
         success: true,
-        message: "Specialties Created Successfully!",
+        message: "Specialties created successfully!",
         data: result
     });
 });
 
-const getAllFromDB = catchAsync(async (req, res) => {
+const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
     const result = await SpecialtiesService.getAllFromDB();
-
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
@@ -25,10 +26,9 @@ const getAllFromDB = catchAsync(async (req, res) => {
     });
 });
 
-const deleteFromDB = catchAsync(async (req, res) => {
+const deleteFromDB = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params;
     const result = await SpecialtiesService.deleteFromDB(id);
-
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
@@ -38,7 +38,7 @@ const deleteFromDB = catchAsync(async (req, res) => {
 });
 
 export const SpecialtiesController = {
-    insertIntoDB,
+    inserIntoDB,
     getAllFromDB,
     deleteFromDB
-}
+};

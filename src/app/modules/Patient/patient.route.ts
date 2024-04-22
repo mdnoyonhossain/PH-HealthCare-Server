@@ -22,7 +22,6 @@ router.delete(
     '/:id',
     PatientController.deleteFromDB
 );
-
 router.delete(
     '/soft/:id',
     PatientController.softDelete

@@ -1,10 +1,10 @@
 import { PaymentStatus, UserRole } from "@prisma/client";
-import { TAuthUser } from "../../interfaces.ts/common";
+import { IAuthUser } from "../../interfaces/common";
+import ApiError from "../../errors/ApiError";
 import prisma from "../../../shared/prisma";
 
-const fetchDashboardMetaData = async (user: TAuthUser) => {
+const fetchDashboardMetaData = async (user: IAuthUser) => {
     let metaData;
-
     switch (user?.role) {
         case UserRole.SUPER_ADMIN:
             metaData = getSuperAdminMetaData();
@@ -13,17 +13,17 @@ const fetchDashboardMetaData = async (user: TAuthUser) => {
             metaData = getAdminMetaData();
             break;
         case UserRole.DOCTOR:
-            metaData = getDoctorMetaData(user as TAuthUser);
+            metaData = getDoctorMetaData(user as IAuthUser);
             break;
         case UserRole.PATIENT:
-            metaData = getPatientMetaData(user as TAuthUser);
+            metaData = getPatientMetaData(user)
             break;
         default:
-            throw new Error("Invalid User Role!");
+            throw new Error('Invalid user role!')
     }
 
     return metaData;
-}
+};
 
 const getSuperAdminMetaData = async () => {
     const appointmentCount = await prisma.appointment.count();
@@ -40,9 +40,9 @@ const getSuperAdminMetaData = async () => {
     });
 
     const barChartData = await getBarChartData();
-    const pieChartData = await getPieChartData();
+    const pieCharData = await getPieChartData();
 
-    return { appointmentCount, patientCount, doctorCount, adminCount, paymentCount, totalRevenue, barChartData, pieChartData }
+    return { appointmentCount, patientCount, doctorCount, adminCount, paymentCount, totalRevenue, barChartData, pieCharData }
 }
 
 const getAdminMetaData = async () => {
@@ -59,12 +59,12 @@ const getAdminMetaData = async () => {
     });
 
     const barChartData = await getBarChartData();
-    const pieChartData = await getPieChartData();
+    const pieCharData = await getPieChartData();
 
-    return { appointmentCount, patientCount, doctorCount, paymentCount, totalRevenue, barChartData, pieChartData }
+    return { appointmentCount, patientCount, doctorCount, paymentCount, totalRevenue, barChartData, pieCharData }
 }
 
-const getDoctorMetaData = async (user: TAuthUser) => {
+const getDoctorMetaData = async (user: IAuthUser) => {
     const doctorData = await prisma.doctor.findUniqueOrThrow({
         where: {
             email: user?.email
@@ -100,7 +100,7 @@ const getDoctorMetaData = async (user: TAuthUser) => {
             },
             status: PaymentStatus.PAID
         }
-    })
+    });
 
     const appointmentStatusDistribution = await prisma.appointment.groupBy({
         by: ['status'],
@@ -113,18 +113,18 @@ const getDoctorMetaData = async (user: TAuthUser) => {
     const formattedAppointmentStatusDistribution = appointmentStatusDistribution.map(({ status, _count }) => ({
         status,
         count: Number(_count.id)
-    }));
+    }))
 
     return {
         appointmentCount,
-        patientCount: patientCount.length,
         reviewCount,
+        patientCount: patientCount.length,
         totalRevenue,
         formattedAppointmentStatusDistribution
     }
 }
 
-const getPatientMetaData = async (user: TAuthUser) => {
+const getPatientMetaData = async (user: IAuthUser) => {
     const patientData = await prisma.patient.findUniqueOrThrow({
         where: {
             email: user?.email
@@ -160,7 +160,7 @@ const getPatientMetaData = async (user: TAuthUser) => {
     const formattedAppointmentStatusDistribution = appointmentStatusDistribution.map(({ status, _count }) => ({
         status,
         count: Number(_count.id)
-    }));
+    }))
 
     return {
         appointmentCount,
@@ -177,10 +177,10 @@ const getBarChartData = async () => {
         FROM "appointments"
         GROUP BY month
         ORDER BY month ASC
-    `;
+    `
 
     return appointmentCountByMonth;
-}
+};
 
 const getPieChartData = async () => {
     const appointmentStatusDistribution = await prisma.appointment.groupBy({

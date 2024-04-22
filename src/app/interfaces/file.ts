@@ -1,4 +1,4 @@
-export type TCloudinaryResponse = {
+export type ICloudinaryResponse = {
     asset_id: string;
     public_id: string
     version: number;
@@ -23,7 +23,7 @@ export type TCloudinaryResponse = {
     api_key: string
 }
 
-export type TFile = {
+export type IFile = {
     fieldname: string
     originalname: string
     encoding: string

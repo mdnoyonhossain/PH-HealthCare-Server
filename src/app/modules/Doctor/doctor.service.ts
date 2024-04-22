@@ -1,12 +1,15 @@
 import { Doctor, Prisma, UserStatus } from "@prisma/client";
 import prisma from "../../../shared/prisma";
-import { paginationHalper } from "../../../helpars/paginationHelpar";
-import { TDoctorFilterRequest, TDoctorUpdate } from "./doctor.interface";
-import { TPaginationOptions } from "../../interfaces.ts/pagination";
+import { IDoctorFilterRequest, IDoctorUpdate } from "./doctor.interface";
+import { IPaginationOptions } from "../../interfaces/pagination";
+import { paginationHelper } from "../../../helpars/paginationHelper";
 import { doctorSearchableFields } from "./doctor.constants";
 
-const getAllFromDB = async (filters: TDoctorFilterRequest, options: TPaginationOptions) => {
-    const { limit, page, skip } = paginationHalper.calculatePagination(options);
+const getAllFromDB = async (
+    filters: IDoctorFilterRequest,
+    options: IPaginationOptions,
+) => {
+    const { limit, page, skip } = paginationHelper.calculatePagination(options);
     const { searchTerm, specialties, ...filterData } = filters;
 
     const andConditions: Prisma.DoctorWhereInput[] = [];
@@ -23,6 +26,7 @@ const getAllFromDB = async (filters: TDoctorFilterRequest, options: TPaginationO
     };
 
     // doctor > doctorSpecialties > specialties -> title
+
     if (specialties && specialties.length > 0) {
         andConditions.push({
             doctorSpecialties: {
@@ -35,8 +39,8 @@ const getAllFromDB = async (filters: TDoctorFilterRequest, options: TPaginationO
                     }
                 }
             }
-        });
-    }
+        })
+    };
 
 
     if (Object.keys(filterData).length > 0) {
@@ -45,7 +49,6 @@ const getAllFromDB = async (filters: TDoctorFilterRequest, options: TPaginationO
                 equals: (filterData as any)[key],
             },
         }));
-
         andConditions.push(...filterConditions);
     }
 
@@ -67,6 +70,11 @@ const getAllFromDB = async (filters: TDoctorFilterRequest, options: TPaginationO
             doctorSpecialties: {
                 include: {
                     specialities: true
+                }
+            },
+            review: {
+                select: {
+                    rating: true
                 }
             }
         },
@@ -97,14 +105,14 @@ const getByIdFromDB = async (id: string): Promise<Doctor | null> => {
                 include: {
                     specialities: true
                 }
-            }
+            },
+            review: true
         }
     });
-
     return result;
 };
 
-const updateIntoDB = async (id: string, payload: TDoctorUpdate) => {
+const updateIntoDB = async (id: string, payload: IDoctorUpdate) => {
     const { specialties, ...doctorData } = payload;
 
     const doctorInfo = await prisma.doctor.findUniqueOrThrow({
@@ -122,8 +130,9 @@ const updateIntoDB = async (id: string, payload: TDoctorUpdate) => {
         });
 
         if (specialties && specialties.length > 0) {
-            // Delete Specialties
+            // delete specialties
             const deleteSpecialtiesIds = specialties.filter(specialty => specialty.isDeleted);
+            //console.log(deleteSpecialtiesIds)
             for (const specialty of deleteSpecialtiesIds) {
                 await transactionClient.doctorSpecialties.deleteMany({
                     where: {
@@ -133,8 +142,9 @@ const updateIntoDB = async (id: string, payload: TDoctorUpdate) => {
                 });
             }
 
-            // Create Specialties
+            // create specialties
             const createSpecialtiesIds = specialties.filter(specialty => !specialty.isDeleted);
+            console.log(createSpecialtiesIds)
             for (const specialty of createSpecialtiesIds) {
                 await transactionClient.doctorSpecialties.create({
                     data: {
@@ -158,7 +168,6 @@ const updateIntoDB = async (id: string, payload: TDoctorUpdate) => {
             }
         }
     })
-
     return result;
 };
 
@@ -201,6 +210,8 @@ const softDelete = async (id: string): Promise<Doctor> => {
         return deleteDoctor;
     });
 };
+
+
 
 export const DoctorService = {
     updateIntoDB,

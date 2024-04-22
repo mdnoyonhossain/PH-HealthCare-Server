@@ -1,28 +1,27 @@
-import httpStatus from "http-status";
+import { Request, Response } from "express";
 import catchAsync from "../../../shared/catchAsync";
-import sendResponse from "../../../shared/sendResponse";
 import { PaymentService } from "./payment.service";
+import sendResponse from "../../../shared/sendResponse";
+import httpStatus from "http-status";
 
-const initPayment = catchAsync(async (req, res) => {
+const initPayment = catchAsync(async (req: Request, res: Response) => {
     const { appointmentId } = req.params;
     const result = await PaymentService.initPayment(appointmentId);
-
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
-        message: "Payment initiatit Successfully",
-        data: result
+        message: 'Payment initiate successfully',
+        data: result,
     });
 });
 
-const validatePayment = catchAsync(async (req, res) => {
+const validatePayment = catchAsync(async (req: Request, res: Response) => {
     const result = await PaymentService.validatePayment(req.query);
-
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
-        message: "Payment Validate Successfully",
-        data: result
+        message: 'Payment validate successfully',
+        data: result,
     });
 });
 
